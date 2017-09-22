@@ -1,0 +1,22 @@
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
+[user]
+	name = Marcel Englmaier
+	email = menglmaier@commercehub.com
+[diff]
+	tool = winmerge
+[difftool]
+	prompt = false
+[difftool "winmerge"]
+	cmd = windiff.sh \"$LOCAL\" \"$REMOTE\"
+[merge]
+	tool = kdiff3
+	log = 1
+[mergetool "kdiff3"]
+	cmd = \"C:\\Program Files\\KDiff3\\kdiff3\" \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
+[core]
+	autocrlf = false
+	editor = \"C:/Program Files (x86)/Notepad++/notepad++.exe\" -multiInst -nosession
+	preloadindex = true 
