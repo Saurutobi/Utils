@@ -2,20 +2,19 @@
 export GIT_SSH=/bin/ssh.exe
 #set up winmerge as diff tool
 export GIT_EXTERNAL_DIFF=windiff.sh
+		#file at c/progfilesx86/git/bin/
 
-# make sure that program files and my o drive are in the path
-export PATH=$PATH:/c/Program\ Files\ \(x86\)/Git/bin:/c/Program\ Files\ \(x86\)/Git/usr/bin:/c/Program\ Files\ \(x86\)/mercent-test-tools:/c/Program\ Files\ \(x86\)/KDiff3:/c/Program\ Files/Mercent/Tools/bin:/c/Program\ Files\ \(x86\)/Microsoft\ SDKs/Windows/v8.0A/bin/NETFX\ 4.0\ Tools/:/c/Program\ Files/TortoiseGit/bin/;
-#C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Program Files\Microsoft SQL Server\110\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn\ManagementStudio\;C:\Program Files (x86)\Microsoft SQL Server\110\DTS\Binn\;C:\Program Files\Mercent\Tools\bin;c:\Program Files (x86)\Microsoft SQL Server\90\Tools\binn\;C:\Program Files\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE\;C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\;C:\Program Files\Microsoft SQL Server\100\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\ManagementStudio\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\PrivateAssemblies\;C:\Program Files (x86)\Microsoft SQL Server\120\DTS\Binn\;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0\;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PrivateAssemblies\;c:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\PrivateAssemblies\;C:\Program Files (x86)\WinMerge;C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.0\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;C:\Program Files\TortoiseGit\bin;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\MSBuild\14.0\Bin\;
-export PERL5LIB=/c/PERL5LIB/
+export PATH=$PATH:/c/Program\ Files\ \(x86\)/Git/bin:/c/Program\ Files\ \(x86\)/KDiff3:
 export GIT_HOME=/c/git/
 
 # set shortcuts
+alias ls='ls -p'
 alias add='git add'
 alias amend='git commit --all --amend; status'
 alias show='git remote show origin'
 alias fetch='git fetch'
 alias show_branches='git branch'
-alias status='git status;echo " ";show_unsubmitted;'
+alias status='git status;echo " ";show_unpushed;'
 alias clean='git clean'
 alias stash='git stash'
 alias pstash='git stash pop'
@@ -24,14 +23,14 @@ alias merge='git merge '
 alias mergetool='git mergetool'
 alias help='git help'
 alias squash='git rebase -i HEAD~3'
-alias diff_work='git status;echo " ";show_unsubmitted;git difftool --dir-diff HEAD &'
+alias diff_work='git status;echo " ";show_unpushed;git difftool --dir-diff HEAD &'
 alias resource='source ~/.bashrc'
 
 #Shows unsubmitted commits
-function show_unsubmitted
+function show_unpushed
 {
-	echo "Showing unsubmitted Commits";
-	git log origin/$(get_branch_name)..HEAD --pretty=format:"%Cred%h%Creset-%C(bold blue)<%an> %Cgreen(%ar)%Creset : %s";
+	echo "Showing unpushed Commits";
+	git log origin/$(get_branch)..HEAD --pretty=format:"%Cred%h%Creset-%C(bold blue)<%an> %Cgreen(%ar)%Creset : %s";
 }
 
 function co
@@ -42,28 +41,27 @@ function co
 # pull branch from origin
 function pull
 {
-	branch=$(get_branch_name "$@");
+	branch=$(get_branch "$@");
 	git pull origin $branch
 }
 
 # push branch 
 function push 
 {
-	branch=$(get_branch_name "$@");
-	git push
+	branch=$(get_branch "$@");
+	git push origin $branch
 }
 
 # push branch 
 function force_push 
 {
-	branch=$(get_branch_name "$@");
-	git push -f
+	branch=$(get_branch "$@");
+	git push -f origin $branch
 }
 
 #hard reset current branch to latest local commit(wipes out working dir changes)
 function reset_hard
 {
-	branch=$(get_branch_name);
 	git reset --hard;
 }
 
@@ -71,7 +69,7 @@ function reset_hard
 function update_branch
 {
 	git fetch;
-	branch=$(get_branch_name);
+	branch=$(get_branch);
 	git reset --hard origin/$branch;
 }
 
@@ -99,8 +97,8 @@ function diff_branch()
 function branch_current()
 { 
 	update_branch;
-	branch=$(get_branch_name "$@");
-	curr=$(get_branch_name);
+	branch=$@;
+	curr=$(get_branch);
 	echo "creating $branch";
 	echo "fetch $curr";
 	git fetch origin $curr;
@@ -115,7 +113,7 @@ function branch_current()
 # call with nuke_branch <branch name>
 function nuke_branch()
 { 
-	branch=$(get_branch_name "$@");
+	branch=$@;
 	echo "deleting local branch";
 	git branch -D $branch; 
 	echo "deleting remote branch";
@@ -128,7 +126,7 @@ function nuke_branch()
 #call with delete_branch <branch name>
 function delete_branch()
 {
-	branch=$(get_branch_name "$@");
+	branch=$@;
 	echo "deleting local branch";
 	git branch -D $branch; 
 	echo "show current branches";
@@ -138,23 +136,6 @@ function delete_branch()
 function get_branch 
 {
 	git rev-parse --abbrev-ref HEAD 2> /dev/null
-}
-
-function get_branch_name
-{
-	if [ -z $1 ];
-	then 
-		echo $(get_branch);
-	else
-		echo $(convertToBranchConvention "$1");
-	fi  
-}
-
-#convert string from camel case to use lowercase and underscores
-function convertToBranchConvention()
-{
-	# use this if you have installed CamelCase.pm and goodBranchName.pl
-	perl ~/goodBranchName.pl "$1";
 }
 
 # Generate a wrapper completion function (completer) for an alias
