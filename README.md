@@ -5,8 +5,12 @@ Common Utils I use across multiple machines
 	common base .bashrc I use. Abstracts some shell functions and many git commands
 	supporting files like .bash_profile, windiff.sh
 	Requires:
-		PER5LIB folder to be placed on c:
+		PER5LIB folder to be placed in "c/"
+		Git folder to be placed in "c/Program Files (x86)"
 		kdiff3 installed
 		notepad++ installed
 		winmerge installed
-		Git folder placed in Program Files (x86)
+	Setup:
+		make sure 2 folders are copied
+		import winmerge settings into winmerge
+		copy the files in Home to your shell's home directory(typically "c/Users/[YOUR USERNAME]/"
