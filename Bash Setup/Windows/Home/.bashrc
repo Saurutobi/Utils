@@ -87,7 +87,7 @@ function contains
 # diff_branch <branch_name> <branch_name>
 function diff_branch()
 {
-	branch=$(get_branch_name "$2");  
+	branch=$(get_branch "$2");  
 	echo "Compare $1 to $branch"
 	git difftool --dir-diff $1..$branch &
 }

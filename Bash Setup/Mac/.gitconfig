@@ -1,0 +1,15 @@
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
+[user]
+	name = Marcel Englmaier
+	email = menglmaier@commercehub.com
+[diff]
+	tool = default-difftool
+[difftool "default-difftool"]
+	cmd = code --wait --diff $LOCAL $REMOTE
+[core]
+	autocrlf = false
+	preloadindex = true 
+	editor = code --wait
