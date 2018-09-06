@@ -1,7 +1,7 @@
 # Utils
 Common Utils I use across multiple machines
 
-###Git Stuff
+### Git Stuff
 Contains MAC and Windows versions of the files. The below comments are mostly windows-based
 <ul>
 	<li>common base .bashrc I use. Abstracts some shell functions and many git commands</li>
