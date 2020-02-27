@@ -28,6 +28,8 @@ alias squash='git rebase -i HEAD~3'
 alias stash='git stash'
 alias status='git status;echo " ";show_unpushed;'
 alias vault_token='vault login -method=ldap -tls-skip-verify -address=https://ewe-vault.test.expedia.com username=menglmaier'
+alias java12='export JAVA_HOME=`/usr/libexec/java_home -v 12`'
+alias java8='export JAVA_HOME=`/usr/libexec/java_home -v 1.8`'
 
 #Shows unsubmitted commits
 function show_unpushed
