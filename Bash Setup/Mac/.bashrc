@@ -1,25 +1,25 @@
 export GIT_HOME=~/Desktop/git
 
 # set shortcuts
-alias ls='ls -ap'
 alias add='git add'
 alias amend='git commit --all --amend; status'
-alias show='git remote show origin'
-alias fetch='git fetch'
-alias show_branches='git branch'
-alias status='git status;echo " ";show_unpushed;'
-alias clean='git clean'
-alias stash='git stash'
-alias pstash='git stash pop'
 alias ci='git commit --all -m '
+alias clean='git clean'
+alias co='git checkout '
+alias diff_work='git status;echo " ";show_unpushed;git difftool --dir-diff HEAD &'
+alias fetch='git fetch'
+alias help='git help'
+alias ls='ls -p'
 alias merge='git merge '
 alias mergetool='git mergetool'
-alias help='git help'
-alias squash='git rebase -i HEAD~3'
-alias diff_work='git status;echo " ";show_unpushed;git difftool --dir-diff HEAD &'
-alias resource='source ~/.bashrc'
+alias pstash='git stash pop'
 alias reset_hard='git reset --hard' #hard reset current branch to latest local commit(wipes out working dir changes)
-alias co='git checkout '
+alias resource='source ~/.bashrc'
+alias show='git remote show origin'
+alias show_branches='git branch'
+alias squash='git rebase -i HEAD~3'
+alias stash='git stash'
+alias status='git status;echo " ";show_unpushed;'
 
 #Shows unsubmitted commits
 function show_unpushed
