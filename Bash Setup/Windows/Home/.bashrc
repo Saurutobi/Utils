@@ -27,6 +27,7 @@ alias show_branches='git branch'
 alias squash='git rebase -i HEAD~3'
 alias stash='git stash'
 alias status='git status;echo " ";show_unpushed;'
+alias vault_token='vault login -method=ldap -tls-skip-verify -address=https://ewe-vault.test.expedia.com username=menglmaier'
 
 #Shows unsubmitted commits
 function show_unpushed
