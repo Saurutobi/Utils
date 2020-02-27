@@ -18,17 +18,14 @@ alias help='git help'
 alias squash='git rebase -i HEAD~3'
 alias diff_work='git status;echo " ";show_unpushed;git difftool --dir-diff HEAD &'
 alias resource='source ~/.bashrc'
+alias reset_hard='git reset --hard' #hard reset current branch to latest local commit(wipes out working dir changes)
+alias co='git checkout '
 
 #Shows unsubmitted commits
 function show_unpushed
 {
 	echo "Showing unpushed Commits";
 	git log origin/$(get_branch)..HEAD --pretty=format:"%Cred%h%Creset-%C(bold blue)<%an> %Cgreen(%ar)%Creset : %s";
-}
-
-function co
-{
-	git checkout "$@";
 }
 
 # pull branch from origin
@@ -50,12 +47,6 @@ function force_push
 {
 	branch=$(get_branch "$@");
 	git push -f origin $branch
-}
-
-#hard reset current branch to latest local commit(wipes out working dir changes)
-function reset_hard
-{
-	git reset --hard;
 }
 
 #hard reset current branch to latest origin commit(wipes out local commits and working dir changes)
