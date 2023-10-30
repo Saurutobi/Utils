@@ -4,7 +4,7 @@
 	smudge = git-lfs smudge %f
 [user]
 	name = Marcel Englmaier
-	email = menglmaier@commercehub.com
+	email = [EMAIL HERE]
 [diff]
 	tool = default-difftool
 [difftool "default-difftool"]
