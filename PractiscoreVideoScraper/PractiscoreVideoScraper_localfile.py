@@ -1,30 +1,13 @@
-import requests, sys
+import requests, sys, json
 
-matchCode =  sys.argv[1]
-firstName = sys.argv[2].lower()
-lastName = sys.argv[3].lower()
-isMarcel = sys.argv[4]
-matchCode = matchCode.strip()
+firstName = sys.argv[1].lower()
+lastName = sys.argv[2].lower()
+isMarcel = sys.argv[3].lower() == 'true'
 
-HEADERS = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:124.0) Gecko/20100101 Firefox/124.0",
-        "Accept": "*/*",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Access-Control-Request-Method": "GET",
-        "Access-Control-Request-Headers": "x-csrf-token",
-        "Referer": "https://practiscore.com/",
-        "Origin": "https://practiscore.com",
-        "Connection": "keep-alive",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "cross-site",
-        "Pragma": "no-cache",
-        "Cache-Control": "no-cache"
-    }
 
-def get_shooterID(matchCode, lastName, firstName):
-    response = requests.get(f"https://s3.amazonaws.com/ps-scores/production/{matchCode}/match_def.json", headers=HEADERS).json()['match_shooters']
+def get_shooterID(lastName, firstName):
+    matchdef = open("localfile/match_def.json")
+    response = json.load(matchdef)['match_shooters']
     for shooter in response:
         if shooter['sh_ln'].lower() == lastName and shooter['sh_fn'].lower() == firstName:
             return { 
@@ -32,8 +15,7 @@ def get_shooterID(matchCode, lastName, firstName):
                 "class": shooter['sh_dvp'],
               }
 
-
-def get_stage_info(matchCode, shooter):
+def get_stage_info(shooter):
     def get_stage_place(stageInfo):
         for shooter in stageInfo:
             if shooter['shooter'] == shooterID:
@@ -67,7 +49,8 @@ def get_stage_info(matchCode, shooter):
 
     shooterClass = shooter['class']
     shooterID = shooter['id']
-    response = requests.get(f'https://s3.amazonaws.com/ps-scores/production/{matchCode}/results.json', headers=HEADERS).json()
+    matchdef = open("localfile/results.json")
+    response = json.load(matchdef)
     stageInfo = []
     get_overall_info(response[0]['Match'][0]['Overall'])
     shooter.update(get_div_info(response[0]['Match']))
@@ -81,7 +64,7 @@ def get_stage_info(matchCode, shooter):
     return stageInfo
 
 
-def find_scores(matchCode, shooter):
+def find_scores(shooter):
     def find_shooter(stagescores):
         for shooter in stagescores:
             if shooter['shtr'] == shooterID:
@@ -128,7 +111,8 @@ def find_scores(matchCode, shooter):
                     test = 0
                 return scores    
 
-    response = requests.get(f"https://s3.amazonaws.com/ps-scores/production/{matchCode}/match_scores.json", headers=HEADERS).json()
+    matchdef = open("localfile/match_scores.json")
+    response = json.load(matchdef)
     totalScores = []
     shooterID = shooter['id']
     for stage in response['match_scores']:
@@ -173,13 +157,7 @@ def marcel_print(stages, scores, shooter):
         printString += f"{float(stages[i]['hitFactor']):.4f}HF"
         print(printString)
         print(" ")
-    print(f"Overall Time {overallScores['time']}")
-    print(f"{shooter['classPlace']} {shooter['class']} ({shooter['classPercent']}%)")
-    print(f"{shooter['place']} Overall ({shooter['matchPercent']}%)")
     printString = ""
-    for key in overallScores:
-        if overallScores[key] > 0 and key != "time":
-            printString += f"{overallScores[key]}{key} "
     print(printString)
 
 def don_print(stages, scores, shooter):
@@ -230,12 +208,14 @@ def don_print(stages, scores, shooter):
     print(printString)
 
 
+shooterInfo = get_shooterID( lastName, firstName)
 
-shooterInfo = get_shooterID(matchCode, lastName, firstName)
+stagePlace = get_stage_info( shooterInfo)
+scores = find_scores(shooterInfo)
 
-stagePlace = get_stage_info(matchCode, shooterInfo)
-scores = find_scores(matchCode,shooterInfo)
-
-don_print(stagePlace, scores, shooterInfo)
+if isMarcel is True:
+    marcel_print(stagePlace, scores, shooterInfo)
+else: 
+    don_print(stagePlace, scores, shooterInfo)
 
 sys.stdout.flush()
