@@ -229,7 +229,7 @@ shooterInfo = get_shooterID(matchCode, lastName, firstName)
 stagePlace = get_stage_info(matchCode, shooterInfo)
 scores = find_scores(matchCode,shooterInfo)
 
-if isMarcel is True:
+if isMarcel:
     marcel_print(stagePlace, scores, shooterInfo)
 else: 
     don_print(stagePlace, scores, shooterInfo)

@@ -4,12 +4,54 @@ firstName = sys.argv[1].lower()
 lastName = sys.argv[2].lower()
 isMarcel = sys.argv[3].lower() == 'true'
 
+def extract_matchdef():
+    with open('localfile/ps_file.txt', 'r') as file:
+        text = file.read()
+
+        start_index = text.find('matchDef = {') + 11
+        end_index = text.rfind(';\n        scores = {') 
+
+        json_string = text[start_index:end_index]
+        
+        try:
+            json_object = json.loads(json_string)
+            return json_object
+        except json.JSONDecodeError:
+            return None  # Invalid JSON format
+
+def extract_scores():
+    with open('localfile/ps_file.txt', 'r') as file:
+        text = file.read()
+
+        start_index = text.find('scores = {') + 9
+        end_index = text.rfind(';\n        results = [{') 
+
+        json_string = text[start_index:end_index]
+        
+        try:
+            json_object = json.loads(json_string)
+            return json_object
+        except json.JSONDecodeError:
+            return None  # Invalid JSON format
+
+def extract_results():
+    with open('localfile/ps_file.txt', 'r') as file:
+        text = file.read()
+
+        start_index = text.find('results = [{') + 10
+        end_index = text.rfind(';\n\n        resultsLoaded = ') 
+
+        json_string = text[start_index:end_index]
+        
+        try:
+            json_object = json.loads(json_string)
+            return json_object
+        except json.JSONDecodeError:
+            return None  # Invalid JSON format
 
 def get_shooterID(lastName, firstName):
-    matchdef = open("localfile/match_def.json")
-    response = json.load(matchdef)['match_shooters']
-    print(matchdef)
-    for shooter in response:
+    matchdef = extract_matchdef()['match_shooters']
+    for shooter in matchdef:
         if shooter['sh_ln'].lower() == lastName and shooter['sh_fn'].lower() == firstName:
             return { 
                 "id": shooter['sh_uuid'], 
@@ -50,20 +92,18 @@ def get_stage_info(shooter):
 
     shooterClass = shooter['class']
     shooterID = shooter['id']
-    matchdef = open("localfile/results.json")
-    response = json.load(matchdef)
+    results = extract_results()
     stageInfo = []
-    get_overall_info(response[0]['Match'][0]['Overall'])
-    shooter.update(get_div_info(response[0]['Match']))
-    for i in range(1, len(response)):
-        stageName = list(response[i].keys())
+    get_overall_info(results[0]['Match'][0]['Overall'])
+    shooter.update(get_div_info(results[0]['Match']))
+    for i in range(1, len(results)):
+        stageName = list(results[i].keys())
         stageName.sort()
         stageName = stageName[0]
-        for div in response[i][stageName]:
+        for div in results[i][stageName]:
             if shooterClass in div:
                 stageInfo.append(get_stage_place(div[shooterClass]))
     return stageInfo
-
 
 def find_scores(shooter):
     def find_shooter(stagescores):
@@ -112,16 +152,14 @@ def find_scores(shooter):
                     test = 0
                 return scores    
 
-    matchdef = open("localfile/match_scores.json")
-    response = json.load(matchdef)
+    scores = extract_scores()
     totalScores = []
     shooterID = shooter['id']
-    for stage in response['match_scores']:
+    for stage in scores['match_scores']:
         val = find_shooter(stage['stage_stagescores'])
         if val:
             totalScores.append(val)   
     return totalScores
-
 
 def marcel_print(stages, scores, shooter):
     overallScores = {
@@ -205,7 +243,6 @@ def marcel_print_insta_reel(stages, scores, shooter):
     printString = ""
     print(printString)
 
-
 def don_print(stages, scores, shooter):
     overallScores = {
         'A': 0,
@@ -254,15 +291,22 @@ def don_print(stages, scores, shooter):
     print(printString)
 
 
-shooterInfo = get_shooterID( lastName, firstName)
+marcelShooterInfo = get_shooterID("englmaier", "marcel")
+donShooterInfo = get_shooterID("carroll", "don")
+ericShooterInfo = get_shooterID("beerbaum", "eric")
+marcelStagePlace = get_stage_info(marcelShooterInfo)
+donStagePlace = get_stage_info(donShooterInfo)
+ericStagePlace = get_stage_info(ericShooterInfo)
+marcelScores = find_scores(marcelShooterInfo)
+donScores = find_scores(donShooterInfo)
+ericScores = find_scores(ericShooterInfo)
 
-stagePlace = get_stage_info( shooterInfo)
-scores = find_scores(shooterInfo)
-
-if isMarcel:
-    marcel_print(stagePlace, scores, shooterInfo)
-    marcel_print_insta_reel(stagePlace, scores, shooterInfo)
-else: 
-    don_print(stagePlace, scores, shooterInfo)
+print("MarcelPrint")
+marcel_print(marcelStagePlace, marcelScores, marcelShooterInfo)
+marcel_print_insta_reel(marcelStagePlace, marcelScores, marcelShooterInfo)
+print("DonniePrint")
+don_print(donStagePlace, donScores, donShooterInfo)
+print("EricPrint")
+marcel_print(ericStagePlace, ericScores, ericShooterInfo)
 
 sys.stdout.flush()
