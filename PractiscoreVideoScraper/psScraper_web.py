@@ -282,28 +282,41 @@ def don_print(stages, scores, shooter):
     printString = ""
     print(printString)
 
-options = FirefoxOptions()
-options.add_argument("--headless")
-driver = webdriver.Firefox(options=options)
+optionss = FirefoxOptions()
+optionss.add_argument("--headless")
+driver = webdriver.Firefox(options=optionss)
 driver.get(url)
 html = driver.page_source.encode('utf-8')
 
-marcelShooterInfo = get_shooterID("englmaier", "marcel", html)
-donShooterInfo = get_shooterID("carroll", "don", html)
-ericShooterInfo = get_shooterID("beerbaum", "eric", html)
-marcelStagePlace = get_stage_info(marcelShooterInfo, html)
-donStagePlace = get_stage_info(donShooterInfo, html)
-ericStagePlace = get_stage_info(ericShooterInfo, html)
-marcelScores = find_scores(marcelShooterInfo, html)
-donScores = find_scores(donShooterInfo, html)
-ericScores = find_scores(ericShooterInfo, html)
+try:
+    marcelShooterInfo = get_shooterID("englmaier", "marcel", html)
+    marcelStagePlace = get_stage_info(marcelShooterInfo, html)
+    marcelScores = find_scores(marcelShooterInfo, html)
+    print("MarcelPrint")
+    marcel_print(marcelStagePlace, marcelScores, marcelShooterInfo)
+    marcel_print_insta_reel(marcelStagePlace, marcelScores, marcelShooterInfo)
+    print("\n\n")
+except:
+    print("No Marcel at match\n\n")
 
-print("MarcelPrint")
-marcel_print(marcelStagePlace, marcelScores, marcelShooterInfo)
-marcel_print_insta_reel(marcelStagePlace, marcelScores, marcelShooterInfo)
-print("DonniePrint")
-don_print(donStagePlace, donScores, donShooterInfo)
-print("EricPrint")
-marcel_print(ericStagePlace, ericScores, ericShooterInfo)
+try:
+    donShooterInfo = get_shooterID("carroll", "don", html)
+    donStagePlace = get_stage_info(donShooterInfo, html)
+    donScores = find_scores(donShooterInfo, html)
+    print("DonniePrint")
+    don_print(donStagePlace, donScores, donShooterInfo)
+    print("\n\n")
+except:
+    print("No Donnie at match\n\n")
+
+try:
+    ericShooterInfo = get_shooterID("beerbaum", "eric", html)
+    ericStagePlace = get_stage_info(ericShooterInfo, html)
+    ericScores = find_scores(ericShooterInfo, html)
+    print("EricPrint")
+    marcel_print(ericStagePlace, ericScores, ericShooterInfo)
+    print("\n\n")
+except:
+    print("No Eric at match\n\n")
 
 sys.stdout.flush()
